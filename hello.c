@@ -2,6 +2,6 @@
 #include <stdlib.h>
 int main(){
     printf("Hello World!");
-    printf('in other branhc');
+    printf("in other branhc - from master");
     return 0;
 }
