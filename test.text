@@ -1,1 +1,86 @@
-My Name is Ashok Kumar Prabhakar and i'm from mathura uttar pradesh. currently i'm working in Bangalore karnataka india. lets meet now
+// write a program for taking data of all students by using thread concept
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
+// Define a structure to store student data
+struct Student {
+    int id;
+    char name[50];
+    float gpa;
+    struct Student* next;
+};
+
+struct Student* head = NULL; // Linked list head
+
+// Function to add a new student to the linked list
+void addStudent(int id, char name[], float gpa) {
+    struct Student* newStudent = (struct Student*)malloc(sizeof(struct Student));
+    newStudent->id = id;
+    strcpy(newStudent->name, name);
+    newStudent->gpa = gpa;
+    newStudent->next = head;
+    head = newStudent;
+}
+
+// Function to display student data
+void displayStudents() {
+    struct Student* current = head;
+    while (current != NULL) {
+        printf("Student ID: %d\n", current->id);
+        printf("Name: %s\n", current->name);
+        printf("GPA: %.2f\n", current->gpa);
+        printf("\n");
+        current = current->next;
+    }
+}
+
+// Thread function to read student data from stdin
+void* inputThread(void* arg) {
+    while (1) {
+        int id;
+        char name[50];
+        float gpa;
+        printf("Enter student ID (or -1 to exit): ");
+        scanf("%d", &id);
+        if (id == -1) break;
+        printf("Enter student name: ");
+        scanf("%s", name);
+        printf("Enter student GPA: ");
+        scanf("%f", &gpa);
+        addStudent(id, name, gpa);
+    }
+    return NULL;
+}
+
+// Thread function to display student data to stdout
+void* outputThread(void* arg) {
+    while (1) {
+        printf("Student Data:\n");
+        displayStudents();
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t thread1, thread2;
+
+    // Create the two threads
+    pthread_create(&thread1, NULL, inputThread, NULL);
+    pthread_create(&thread2, NULL, outputThread, NULL);
+
+    // Wait for the threads to finish
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+
+    // Free allocated memory
+    while (head != NULL) {
+        struct Student* temp = head;
+        head = head->next;
+        free(temp);
+    }
+
+    return 0;
+}
+
